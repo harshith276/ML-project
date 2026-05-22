@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import logging
 from sqlalchemy.engine import Engine
 
-from backend.src.agent import sql_agent
+from src.agent import sql_agent
 
 logger = logging.getLogger(__name__)
 
@@ -153,11 +153,11 @@ def generate_insight(user_query: str) -> AgentResponse:
         RuntimeError: Propagated from sql_agent if Ollama is unreachable or
                       from SQLAlchemy if the database is unavailable.
     """
-    from backend.src.database.database import engine as _engine
+    from src.database.database import engine as _engine
     return run_full_query(user_query, _engine)
 
 if __name__ == "__main__":
-    from backend.src.database.database import engine
+    from src.database.database import engine
     
     # Configure logging for standard execution view
     logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')

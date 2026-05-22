@@ -62,7 +62,7 @@ def _decode_token(token: str) -> Optional[dict]:
     except JWTError:
         return None
 
-from backend.src.agent.playbook_generator import generate_insight
+from src.agent.playbook_generator import generate_insight
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -212,7 +212,7 @@ def health_check() -> HealthResponse:
     Returns HTTP 200 if healthy, HTTP 503 if the database is unreachable.
     """
     try:
-        from backend.src.database.database import engine
+        from src.database.database import engine
         with engine.connect():
             pass
         return HealthResponse(
@@ -284,7 +284,7 @@ def get_segments() -> SegmentsResponse:
 
     All customers with is_outlier = TRUE are excluded from segment stats.
     """
-    from backend.src.database.database import engine
+    from src.database.database import engine
     import pandas as pd
     from datetime import timezone
     import datetime
@@ -413,7 +413,7 @@ def get_transactions(
     Returns a paginated, searchable, filterable view of the transactions table.
     Default excludes outlier rows. Search applies ILIKE on transaction_id and customer_id.
     """
-    from backend.src.database.database import engine
+    from src.database.database import engine
 
     try:
         with engine.connect() as conn:
@@ -501,7 +501,7 @@ def chat(body: ChatRequest) -> ChatResponse:
     The LLM does NOT write SQL — it only reads the pre-fetched data summary
     and answers in natural language. This makes responses fast and reliable.
     """
-    from backend.src.database.database import engine
+    from src.database.database import engine
     from langchain_ollama import OllamaLLM
 
     if not body.messages:
@@ -627,8 +627,8 @@ def chat(body: ChatRequest) -> ChatResponse:
 @app.on_event("startup")
 def _on_startup() -> None:
     """Create all ORM-mapped tables that don't yet exist in the DB."""
-    from backend.src.database.database import engine
-    from backend.src.database import models  # noqa: F401 — imports register models
+    from src.database.database import engine
+    from src.database import models  # noqa: F401 — imports register models
     models.Base.metadata.create_all(bind=engine)
     logger.info("Database tables verified / created on startup.")
 
@@ -671,8 +671,8 @@ def register(body: RegisterRequest) -> AuthResponse:
     Returns a signed JWT (24 h expiry) on success.
     Raises HTTP 409 if the email is already taken.
     """
-    from backend.src.database.database import SessionLocal
-    from backend.src.database.models import User
+    from src.database.database import SessionLocal
+    from src.database.models import User
 
     db = SessionLocal()
     try:
@@ -708,8 +708,8 @@ def login(body: LoginRequest) -> AuthResponse:
     Uses bcrypt.verify — timing-safe comparison prevents user enumeration.
     Raises HTTP 401 for any credential mismatch (intentionally vague).
     """
-    from backend.src.database.database import SessionLocal
-    from backend.src.database.models import User
+    from src.database.database import SessionLocal
+    from src.database.models import User
 
     db = SessionLocal()
     try:
@@ -746,8 +746,8 @@ def me(token: str = Depends(oauth2_scheme)) -> dict:
     if not payload:
         raise HTTPException(status_code=401, detail="Token invalid or expired.")
 
-    from backend.src.database.database import SessionLocal
-    from backend.src.database.models import User
+    from src.database.database import SessionLocal
+    from src.database.models import User
 
     db = SessionLocal()
     try:

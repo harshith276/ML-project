@@ -2,8 +2,8 @@ import logging
 import pandas as pd
 from sqlalchemy import func
 
-from backend.src.database.database import Base, SessionLocal, engine
-from backend.src.database.models import Transaction
+from src.database.database import Base, SessionLocal, engine
+from src.database.models import Transaction
 
 # Configure logging to use INFO level, no print statements
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')

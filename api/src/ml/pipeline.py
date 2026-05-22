@@ -1,9 +1,9 @@
 import logging
 from sqlalchemy import func
 
-from backend.src.database.database import engine, SessionLocal
-from backend.src.database.models import Transaction
-from backend.src.ml import cleaner, clustering
+from src.database.database import engine, SessionLocal
+from src.database.models import Transaction
+from src.ml import cleaner, clustering
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')

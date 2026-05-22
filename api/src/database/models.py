@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, DateTime, Integer, Numeric, String
 from sqlalchemy.sql import func
 
-from backend.src.database.database import Base
+from src.database.database import Base
 
 
 class Transaction(Base):

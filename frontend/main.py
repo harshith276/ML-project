@@ -116,7 +116,7 @@ st.sidebar.markdown("---")
 
 st.sidebar.button("🔄 Re-run ML Pipeline")
 # Phase 6 could wire this to subprocess.run().
-st.sidebar.info("To re-run: python -m backend.src.ml.pipeline")
+st.sidebar.info("To re-run: python -m src.ml.pipeline")
 
 try:
     with engine.connect() as conn:
