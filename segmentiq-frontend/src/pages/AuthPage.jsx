@@ -162,7 +162,7 @@ export default function AuthPage() {
     const guestPass = 'guest_password_123';
 
     setLoading(true);
-    fetch('/api/auth/register', {
+    fetch('https://segmentiq-api.onrender.com/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Guest User', email: guestEmail, password: guestPass })

@@ -150,7 +150,7 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/segments');
+      const res = await fetch('https://segmentiq-api.onrender.com/api/segments');
       if (!res.ok) throw new Error(`Server error ${res.status}`);
       const json = await res.json();
       setData(json);
