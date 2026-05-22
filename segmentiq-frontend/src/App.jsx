@@ -14,7 +14,7 @@ import LandingPage    from './pages/LandingPage';
 import AuthPage       from './pages/AuthPage';
 import DashboardPage  from './pages/DashboardPage';
 import ProfileSettings from './pages/ProfileSettings';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './Components/ProtectedRoute';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 export default function App() {
