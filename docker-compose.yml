@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  segmentiq_db:
+    image: postgres:15-alpine
+    container_name: segmentiq_postgres
+    environment:
+      POSTGRES_USER: segmentiq_user
+      POSTGRES_PASSWORD: segmentiq_pass
+      POSTGRES_DB: segmentiq
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U segmentiq_user -d segmentiq"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
