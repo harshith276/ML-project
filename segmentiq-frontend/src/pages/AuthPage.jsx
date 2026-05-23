@@ -71,6 +71,25 @@ export default function AuthPage() {
   // Shake animation trigger for errors
   const [shake, setShake] = useState(0);
 
+  // Check if user is already authenticated on mount
+  useEffect(() => {
+    const token = localStorage.getItem('segmentiq_token');
+    if (token) {
+      // Verify the token is still valid
+      fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(res => {
+          if (res.ok) {
+            navigate('/dashboard', { replace: true });
+          }
+        })
+        .catch(() => {
+          // Token is invalid, stay on auth page
+        });
+    }
+  }, [navigate]);
+  
   // Clear errors when switching tabs
   useEffect(() => {
     setError(null);
@@ -112,9 +131,9 @@ export default function AuthPage() {
 setLoading(true);
 
 try {
-  // FORCE the absolute Render backend URL explicitly
-  const baseUrl = 'https://segmentiq-api.onrender.com';
-  const endpoint = activeTab === 'login' ? `${baseUrl}/api/auth/login` : `${baseUrl}/api/auth/register`;
+  // Use relative path for proxy support
+  const baseUrl = '/api';
+  const endpoint = activeTab === 'login' ? `${baseUrl}/auth/login` : `${baseUrl}/auth/register`;
   
   const body = activeTab === 'login'
     ? { email, password }
@@ -155,6 +174,7 @@ try {
 } finally {
   setLoading(false);
 }
+  };
 
   const handleGuest = () => {
     // For demo purposes, we still need a valid token to bypass ProtectedRoute.
@@ -169,7 +189,7 @@ try {
     const guestPass = 'guest_password_123';
 
     setLoading(true);
-    fetch('https://segmentiq-api.onrender.com/api/auth/register', {
+    fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Guest User', email: guestEmail, password: guestPass })
@@ -394,5 +414,4 @@ try {
       </div>
     </div>
   );
-}
 }

@@ -20,7 +20,7 @@ export default function ProtectedRoute({ children }) {
       return;
     }
 
-    fetch('https://segmentiq-api.onrender.com/api/auth/me', {
+    fetch('/api/auth/me', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => setStatus(res.ok ? 'ok' : 'denied'))

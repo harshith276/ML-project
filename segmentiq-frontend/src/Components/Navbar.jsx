@@ -16,7 +16,7 @@ function HealthDot() {
   useEffect(() => {
     const check = async () => {
       try {
-        const res = await fetch('https://segmentiq-api.onrender.com/api/health');
+        const res = await fetch('/api/health');
         setStatus(res.ok ? 'ok' : 'error');
       } catch {
         setStatus('error');
