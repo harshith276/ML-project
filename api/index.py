@@ -6,13 +6,14 @@ Run with:
 
 Endpoints
 ---------
-GET  /health             — Liveness probe.
-GET  /segments           — Live KPI summary + cluster data.
-GET  /transactions       — Paginated transaction rows.
-POST /chat               — Ollama chatbot.
-POST /auth/register      — Create account (bcrypt + JWT).
-POST /auth/login         — Sign in (bcrypt verify + JWT).
-GET  /auth/me            — Validate JWT, return user info.
+GET  /api/health             — Liveness probe.
+GET  /api/segments           — Live KPI summary + cluster data.
+GET  /api/transactions       — Paginated transaction rows.
+POST /api/chat               — Ollama chatbot.
+POST /api/auth/register      — Create account (bcrypt + JWT).
+POST /api/auth/login         — Sign in (bcrypt verify + JWT).
+GET  /api/auth/me            — Validate JWT, return user info.
+POST /api/ask-ai             — AI analyst (legacy Streamlit endpoint).
 """
 
 import logging
@@ -39,7 +40,7 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_HOURS = 24
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 
 def _hash_password(plain: str) -> str:
@@ -91,7 +92,7 @@ app = FastAPI(
     version="2.0.0",
 )
 
-# CORS — allow Streamlit (8501) and Vite dev server (5173) and any localhost origin.
+# CORS — allow Streamlit (8501), Vite dev server (5173), and Vercel production domain.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -101,6 +102,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://ml-project-92xv.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -201,7 +203,7 @@ class ChatResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 @app.get(
-    "/health",
+    "/api/health",
     response_model=HealthResponse,
     summary="Liveness probe",
     tags=["ops"],
@@ -229,7 +231,7 @@ def health_check() -> HealthResponse:
 
 
 @app.post(
-    "/ask-ai",
+    "/api/ask-ai",
     response_model=AskResponse,
     summary="Run the AI Analyst (legacy SQL agent)",
     tags=["agent"],
@@ -271,7 +273,7 @@ def ask_ai(body: AskRequest) -> AskResponse:
 
 
 @app.get(
-    "/segments",
+    "/api/segments",
     response_model=SegmentsResponse,
     summary="Live KPI summary + cluster stats",
     tags=["data"],
@@ -397,7 +399,7 @@ def get_segments() -> SegmentsResponse:
 
 
 @app.get(
-    "/transactions",
+    "/api/transactions",
     response_model=TransactionsResponse,
     summary="Paginated transaction rows",
     tags=["data"],
@@ -484,7 +486,7 @@ def get_transactions(
 
 
 @app.post(
-    "/chat",
+    "/api/chat",
     response_model=ChatResponse,
     summary="Context-aware Ollama chatbot",
     tags=["chat"],
@@ -660,7 +662,7 @@ class AuthResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 @app.post(
-    "/auth/register",
+    "/api/auth/register",
     response_model=AuthResponse,
     summary="Create a new account",
     tags=["auth"],
@@ -697,7 +699,7 @@ def register(body: RegisterRequest) -> AuthResponse:
 
 
 @app.post(
-    "/auth/login",
+    "/api/auth/login",
     response_model=AuthResponse,
     summary="Sign in with email + password",
     tags=["auth"],
@@ -730,7 +732,7 @@ def login(body: LoginRequest) -> AuthResponse:
 
 
 @app.get(
-    "/auth/me",
+    "/api/auth/me",
     summary="Validate token and return current user",
     tags=["auth"],
 )
