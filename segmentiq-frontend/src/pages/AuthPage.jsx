@@ -109,45 +109,52 @@ export default function AuthPage() {
       }
     }
 
-    setLoading(true);
+setLoading(true);
 
-    try {
-      const endpoint = activeTab === 'login' ? '/api/auth/login' : '/api/auth/register';
-      const body = activeTab === 'login'
-        ? { email, password }
-        : { name, email, password };
+try {
+  // FORCE the absolute Render backend URL explicitly
+  const baseUrl = 'https://segmentiq-api.onrender.com';
+  const endpoint = activeTab === 'login' ? `${baseUrl}/api/auth/login` : `${baseUrl}/api/auth/register`;
+  
+  const body = activeTab === 'login'
+    ? { email, password }
+    : { name, email, password };
 
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
 
-      const data = await res.json();
+  // Read the response text first to debug if it's not JSON
+  const textData = await res.text();
+  let data;
+  try {
+    data = JSON.parse(textData);
+  } catch (e) {
+    throw new Error(`Server returned a non-JSON error: ${textData.substring(0, 50)}`);
+  }
 
-      if (!res.ok) {
-        // Smart Redirection Flow: If sign in fails (simulate account doesn't exist via 401)
-        if (activeTab === 'login' && res.status === 401) {
-          setActiveTab('signup');
-          // Set a styled inline message to guide the user
-          setError('Create your account to get access.');
-          setShake(s => s + 1);
-          return;
-        }
-        throw new Error(data.detail || 'Authentication failed. Please try again.');
-      }
-
-      // Success — store token and redirect
-      localStorage.setItem('segmentiq_token', data.access_token);
-      navigate('/dashboard');
-
-    } catch (err) {
-      setError(err.message);
+  if (!res.ok) {
+    if (activeTab === 'login' && res.status === 401) {
+      setActiveTab('signup');
+      setError('Create your account to get access.');
       setShake(s => s + 1);
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+    throw new Error(data.detail || 'Authentication failed. Please try again.');
+  }
+
+  // Success — store token and redirect
+  localStorage.setItem('segmentiq_token', data.access_token);
+  navigate('/dashboard');
+
+} catch (err) {
+  setError(err.message);
+  setShake(s => s + 1);
+} finally {
+  setLoading(false);
+}
 
   const handleGuest = () => {
     // For demo purposes, we still need a valid token to bypass ProtectedRoute.
@@ -387,4 +394,5 @@ export default function AuthPage() {
       </div>
     </div>
   );
+}
 }
